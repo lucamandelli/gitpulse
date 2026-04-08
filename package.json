@@ -1,0 +1,13 @@
+{
+  "name": "gitpulse",
+  "private": true,
+  "scripts": {
+    "api": "npm run start:dev --prefix apps/api",
+    "worker": "npm run start:dev --prefix apps/worker",
+    "frontend": "npm run dev --prefix apps/frontend",
+    "app": "concurrently -n api,worker,frontend -c auto \"npm run start:dev --prefix apps/api\" \"npm run start:dev --prefix apps/worker\" \"npm run dev --prefix apps/frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

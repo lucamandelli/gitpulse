@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --save
+      - "60"
+      - "1"
+      - --loglevel
+      - warning
+      - --requirepass
+      - ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+
+  bull-board:
+    image: venatum/bull-board:latest
+    restart: unless-stopped
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      PORT: "3000"
+      BULL_PREFIX: ${BULL_PREFIX:-bull}
+      BULL_VERSION: ${BULL_VERSION:-BULLMQ}
+      USER_LOGIN: ${BULL_BOARD_USER_LOGIN:-}
+      USER_PASSWORD: ${BULL_BOARD_USER_PASSWORD:-}
+    ports:
+      - "${BULL_BOARD_PORT:-3001}:3000"
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
+  redis_data:
