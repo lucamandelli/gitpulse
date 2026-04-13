@@ -1,16 +1,16 @@
 import { env } from './config/env'
 import { buildApp } from './app'
 
-const app = buildApp()
-
 const start = async () => {
   try {
+    const app = await buildApp()
+
     await app.listen({
       port: env.API_PORT,
       host: '0.0.0.0',
     })
   } catch (err) {
-    app.log.error(err)
+    process.stderr.write(`${err}\n`)
     process.exit(1)
   }
 }
