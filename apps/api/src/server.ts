@@ -1,3 +1,4 @@
+import { env } from './config/env'
 import { buildApp } from './app'
 
 const app = buildApp()
@@ -5,7 +6,7 @@ const app = buildApp()
 const start = async () => {
   try {
     await app.listen({
-      port: Number(process.env.API_PORT) || 3333,
+      port: env.API_PORT,
       host: '0.0.0.0',
     })
   } catch (err) {
