@@ -1,19 +1,60 @@
-import { pgTable, serial, text, integer, timestamp, index, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, serial, text, integer, boolean, timestamp, index, uniqueIndex } from 'drizzle-orm/pg-core'
 
 export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
+  id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
-  github_id: text('github_id').notNull().unique(),
-  avatar_url: text('avatar_url'),
-  created_at: timestamp('created_at').defaultNow().notNull(),
+  emailVerified: boolean('email_verified').notNull().default(false),
+  image: text('image'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const sessions = pgTable('sessions', {
+  id: text('id').primaryKey(),
+  expiresAt: timestamp('expires_at').notNull(),
+  token: text('token').notNull().unique(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  userId: text('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
+})
+
+export const accounts = pgTable('accounts', {
+  id: text('id').primaryKey(),
+  accountId: text('account_id').notNull(),
+  providerId: text('provider_id').notNull(),
+  userId: text('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
+  accessToken: text('access_token'),
+  refreshToken: text('refresh_token'),
+  idToken: text('id_token'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at'),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+  scope: text('scope'),
+  password: text('password'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const verifications = pgTable('verifications', {
+  id: text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  value: text('value').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 export const repositories = pgTable(
   'repositories',
   {
     id: serial('id').primaryKey(),
-    user_id: integer('user_id')
+    userId: text('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
     github_repo_name: text('github_repo_name').notNull(),
@@ -21,8 +62,8 @@ export const repositories = pgTable(
     created_at: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [
-    index('repositories_user_id_idx').on(t.user_id),
-    uniqueIndex('repositories_user_id_github_repo_name_idx').on(t.user_id, t.github_repo_name),
+    index('repositories_user_id_idx').on(t.userId),
+    uniqueIndex('repositories_user_id_github_repo_name_idx').on(t.userId, t.github_repo_name),
   ],
 )
 
@@ -30,13 +71,13 @@ export const summaries = pgTable(
   'summaries',
   {
     id: serial('id').primaryKey(),
-    repository_id: integer('repository_id')
+    repositoryId: integer('repository_id')
       .references(() => repositories.id, { onDelete: 'cascade' })
       .notNull(),
     type: text('type').notNull(),
     content: text('content').notNull(),
-    github_ref: text('github_ref'),
-    created_at: timestamp('created_at').defaultNow().notNull(),
+    githubRef: text('github_ref'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (t) => [index('summaries_repository_id_idx').on(t.repository_id)],
+  (t) => [index('summaries_repository_id_idx').on(t.repositoryId)],
 )
