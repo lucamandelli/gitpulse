@@ -8,7 +8,7 @@ const healthRoutes: FastifyPluginAsync = async (fastify) => {
       return { status: 'ok', db: 'connected' }
     } catch {
       reply.status(503)
-      return { status: 'ok', db: 'disconnected' }
+      return { status: 'error', db: 'disconnected' }
     }
   })
 }
