@@ -8,6 +8,20 @@
       "when": 1776129069267,
       "tag": "0000_pink_william_stryker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776258174636,
+      "tag": "0001_wise_harpoon",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776259188727,
+      "tag": "0002_easy_havok",
+      "breakpoints": true
     }
   ]
 }
