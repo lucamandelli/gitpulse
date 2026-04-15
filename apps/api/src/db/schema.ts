@@ -64,6 +64,7 @@ export const repositories = pgTable(
     defaultBranch: text('default_branch').notNull().default('main'),
     stars: integer('stars').notNull().default(0),
     createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull(),
   },
   (t) => [
     index('repositories_user_id_idx').on(t.userId),
