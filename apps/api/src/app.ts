@@ -6,6 +6,7 @@ import { env } from './config/env'
 import healthRoutes from './routes/health'
 import authRoutes from './routes/auth'
 import meRoutes from './routes/me'
+import reposRoutes from './routes/repos'
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = fastify({ logger: true })
@@ -22,6 +23,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   app.register(healthRoutes)
   app.register(authRoutes)
   app.register(meRoutes)
+  app.register(reposRoutes)
 
   return app
 }
