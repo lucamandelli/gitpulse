@@ -11,3 +11,9 @@
 
 - **Sempre verificar skills e MCPs disponíveis antes de iniciar qualquer desenvolvimento.** Antes de escrever código ou executar tarefas, verificar se existe alguma skill relevante (via ferramenta `Skill`) ou MCP que possa auxiliar — como `superpowers:brainstorming`, `superpowers:writing-plans`, `context7-mcp`, `frontend-design`, entre outros.
 - **Prioridade de uso:** skills de processo primeiro (brainstorming, debugging, planejamento), depois skills de implementação (frontend-design, claude-api, etc.).
+
+## Context7 — Boas Práticas das Stacks
+
+- **Sempre consultar o Context7 antes de implementar qualquer feature.** Para cada stack envolvida (ex: Fastify, React, Prisma, Vite, Docker, etc.), usar o MCP `context7` para buscar a documentação atualizada e garantir que o código segue as melhores práticas e padrões de clean code da stack.
+- **Sequência obrigatória:** `resolve-library-id` com o nome da biblioteca → `query-docs` com a pergunta específica → aplicar o que foi encontrado na implementação.
+- **Não assumir conhecimento prévio das APIs.** Mesmo para bibliotecas familiares, consultar o Context7 para garantir que está usando a versão correta e as APIs mais recentes — o treinamento pode estar desatualizado.
