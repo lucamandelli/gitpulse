@@ -82,7 +82,7 @@ function App() {
 
       <main className="max-w-5xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-semibold text-white">
-          Bem-vindo, {session.user.name.split(' ')[0]}!
+          Bem-vindo, {session.user.name?.split(' ')[0] || session.user.email}!
         </h2>
         <p className="mt-2 text-gray-400">
           Seus repositórios e resumos aparecerão aqui em breve.
