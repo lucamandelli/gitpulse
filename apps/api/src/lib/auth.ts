@@ -12,7 +12,7 @@ export const auth = betterAuth({
   }),
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
-  trustedOrigins: ['http://localhost:3000'],
+  trustedOrigins: [env.CORS_ORIGIN],
   socialProviders: {
     github: {
       clientId: env.GITHUB_CLIENT_ID,
