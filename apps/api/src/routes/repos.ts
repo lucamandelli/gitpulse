@@ -36,7 +36,6 @@ const reposRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.register(authGuard)
 
   fastify.post('/api/repos', async (request, reply) => {
-
     const parsed = addRepoBodySchema.safeParse(request.body)
 
     if (!parsed.success) {
@@ -76,16 +75,6 @@ const reposRoutes: FastifyPluginAsync = async (fastify) => {
       throw err
     }
 
-    const [existing] = await db
-      .select({ id: repositories.id })
-      .from(repositories)
-      .where(and(eq(repositories.userId, userId), eq(repositories.githubRepoName, fullName)))
-      .limit(1)
-
-    if (existing) {
-      return reply.status(409).send({ error: 'Repository is already being monitored' })
-    }
-
     const [repo] = await db
       .insert(repositories)
       .values({
@@ -97,7 +86,12 @@ const reposRoutes: FastifyPluginAsync = async (fastify) => {
         defaultBranch: repoInfo.default_branch,
         stars: repoInfo.stargazers_count,
       })
+      .onConflictDoNothing()
       .returning()
+
+    if (!repo) {
+      return reply.status(409).send({ error: 'Repository is already being monitored' })
+    }
 
     return reply.status(201).send({ repository: repo })
   })
