@@ -26,17 +26,18 @@ async function getUserGitHubToken(userId: string): Promise<string> {
   return account.accessToken
 }
 
+const addRepoBodySchema = z.object({
+  fullName: z
+    .string()
+    .regex(/^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/, 'Must be in "owner/repo" format'),
+})
+
 const reposRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.register(authGuard)
 
   fastify.post('/api/repos', async (request, reply) => {
-    const schema = z.object({
-      fullName: z
-        .string()
-        .regex(/^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/, 'Must be in "owner/repo" format'),
-    })
 
-    const parsed = schema.safeParse(request.body)
+    const parsed = addRepoBodySchema.safeParse(request.body)
 
     if (!parsed.success) {
       return reply
@@ -130,7 +131,7 @@ const reposRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(404).send({ error: 'Repository not found' })
     }
 
-    return reply.send({ repository: deleted })
+    return reply.send({ repository: deleted[0] })
   })
 }
 
