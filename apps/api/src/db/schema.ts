@@ -7,7 +7,7 @@ export const users = pgTable('users', {
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull(),
 })
 
 export const sessions = pgTable('sessions', {
@@ -15,7 +15,7 @@ export const sessions = pgTable('sessions', {
   expiresAt: timestamp('expires_at').notNull(),
   token: text('token').notNull().unique(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
   userId: text('user_id')
@@ -38,7 +38,7 @@ export const accounts = pgTable('accounts', {
   scope: text('scope'),
   password: text('password'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull(),
 })
 
 export const verifications = pgTable('verifications', {
@@ -47,7 +47,7 @@ export const verifications = pgTable('verifications', {
   value: text('value').notNull(),
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
 })
 
 export const repositories = pgTable(
@@ -57,13 +57,13 @@ export const repositories = pgTable(
     userId: text('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
-    github_repo_name: text('github_repo_name').notNull(),
-    github_repo_url: text('github_repo_url').notNull(),
-    created_at: timestamp('created_at').defaultNow().notNull(),
+    githubRepoName: text('github_repo_name').notNull(),
+    githubRepoUrl: text('github_repo_url').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [
     index('repositories_user_id_idx').on(t.userId),
-    uniqueIndex('repositories_user_id_github_repo_name_idx').on(t.userId, t.github_repo_name),
+    uniqueIndex('repositories_user_id_github_repo_name_idx').on(t.userId, t.githubRepoName),
   ],
 )
 
