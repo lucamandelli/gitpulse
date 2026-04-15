@@ -19,6 +19,14 @@ Após a implementação da autenticação com BetterAuth (issue #5), o fluxo pó
 - Paginação da lista de repos — desnecessário com poucos repos
 - `summaries.type` como pgEnum — issue futura
 
+## Mockups aprovados
+
+Referência visual para implementação (abrir no browser):
+
+- [`mockups/empty-state.html`](mockups/empty-state.html) — Empty state com welcome + dashed CTA + ghost cards
+- [`mockups/add-repo-modal.html`](mockups/add-repo-modal.html) — Modal com busca, checkboxes e botão batch
+- [`mockups/dashboard-grid.html`](mockups/dashboard-grid.html) — Dashboard com grid de cards 2 colunas
+
 ## Frontend
 
 ### Fix do redirect
