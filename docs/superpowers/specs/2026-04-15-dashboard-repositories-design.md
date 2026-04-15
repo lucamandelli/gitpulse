@@ -12,6 +12,15 @@ Após a implementação da autenticação com BetterAuth (issue #5), o fluxo pó
 4. **Remoção de repositórios** — com confirmação
 5. **Backend como proxy** — endpoints protegidos que usam o access_token do usuário
 
+## Limpeza pós-implementação
+
+Após a conclusão da issue, deletar os arquivos de orientação que não fazem parte da codebase de produção:
+
+- `docs/superpowers/specs/2026-04-15-dashboard-repositories-design.md` (este arquivo)
+- `docs/superpowers/specs/mockups/` (diretório inteiro)
+
+Esses artefatos servem exclusivamente para guiar o desenvolvimento.
+
 ## Fora do escopo
 
 - Conteúdo rico nos cards (summaries, stats, atividade) — issue futura
