@@ -43,13 +43,20 @@ export async function fetchGitHubRepo(
   accessToken: string,
   fullName: string,
 ): Promise<GitHubRepoInfo> {
-  const response = await fetch(`https://api.github.com/repos/${fullName}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      Accept: 'application/vnd.github.v3+json',
-      'User-Agent': 'GitPulse',
-    },
-  })
+  let response: Response
+
+  try {
+    response = await fetch(`https://api.github.com/repos/${fullName}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/vnd.github.v3+json',
+        'User-Agent': 'GitPulse',
+      },
+      signal: AbortSignal.timeout(10000),
+    })
+  } catch {
+    throw new GitHubApiError(0, 'Request timed out or failed')
+  }
 
   if (response.status === 401) {
     throw new GitHubUnauthorizedError()
@@ -65,5 +72,11 @@ export async function fetchGitHubRepo(
   }
 
   const data = await response.json()
-  return githubRepoSchema.parse(data)
+  const parsed = githubRepoSchema.safeParse(data)
+
+  if (!parsed.success) {
+    throw new GitHubApiError(0, 'Unexpected GitHub API response shape')
+  }
+
+  return parsed.data
 }
