@@ -61,5 +61,19 @@ services:
       api:
         condition: service_healthy
 
+  postgres-test:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: gitpulse
+      POSTGRES_PASSWORD: gitpulse
+      POSTGRES_DB: gitpulse_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gitpulse"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   pgdata:
