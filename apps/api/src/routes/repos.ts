@@ -1,16 +1,16 @@
 import { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
-import { db } from '../db/client'
-import { repositories, accounts } from '../db/schema'
-import authGuard from '../plugins/auth-guard'
+import { db } from '@/db/client'
+import { repositories, accounts } from '@/db/schema'
+import authGuard from '@/plugins/auth-guard'
 import {
   fetchGitHubRepo,
   GitHubTokenNotFoundError,
   GitHubUnauthorizedError,
   GitHubRepoNotFoundError,
   GitHubApiError,
-} from '../lib/github'
+} from '@/lib/github'
 
 async function getUserGitHubToken(userId: string): Promise<string> {
   const [account] = await db

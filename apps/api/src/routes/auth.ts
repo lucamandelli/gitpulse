@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from 'fastify'
 import { fromNodeHeaders } from 'better-auth/node'
-import { auth } from '../lib/auth'
+import { auth } from '@/lib/auth'
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.route({

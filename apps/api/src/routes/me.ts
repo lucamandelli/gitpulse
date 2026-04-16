@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import authGuard from '../plugins/auth-guard'
+import authGuard from '@/plugins/auth-guard'
 
 const meRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.register(authGuard)
