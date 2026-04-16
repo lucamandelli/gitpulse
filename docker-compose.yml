@@ -63,6 +63,7 @@ services:
 
   postgres-test:
     image: postgres:16-alpine
+    profiles: ["test"]
     ports:
       - "5433:5432"
     environment:
