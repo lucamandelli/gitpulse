@@ -17,6 +17,12 @@
 - **Sequência obrigatória:** `resolve-library-id` com o nome da biblioteca → `query-docs` com a pergunta específica → aplicar o que foi encontrado na implementação.
 - **Não assumir conhecimento prévio das APIs.** Mesmo para bibliotecas familiares, consultar o Context7 para garantir que está usando a versão correta e as APIs mais recentes — o treinamento pode estar desatualizado.
 
+## Testes no Backend
+
+- **Toda rota nova ou modificada em `apps/api` DEVE vir acompanhada de testes** em `apps/api/tests/integration/`. PRs que adicionam/modificam rotas sem testes são rejeitados no review.
+- **Comandos**: `npm test` (executar uma vez), `npm run test:watch` (modo watch), `npm run test:coverage` (com cobertura).
+- **Pré-requisito local**: `docker compose up -d postgres-test` para subir o Postgres de teste na porta 5433.
+
 ## Convenções de Código
 
 - **Sempre usar path aliases (`@/*`) para imports cross-diretório no `apps/api`.** Imports como `../lib/auth` ou `../../config/env` devem usar `@/lib/auth`, `@/config/env`, etc. Manter `./` apenas para imports no mesmo diretório (mesmo nível de arquivo), sempre com extensão `.js` (ex: `./app.js`, `./client.js`).
