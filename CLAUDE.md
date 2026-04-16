@@ -17,3 +17,8 @@
 - **Sempre consultar o Context7 antes de implementar qualquer feature.** Para cada stack envolvida (ex: Fastify, React, Prisma, Vite, Docker, etc.), usar o MCP `context7` para buscar a documentação atualizada e garantir que o código segue as melhores práticas e padrões de clean code da stack.
 - **Sequência obrigatória:** `resolve-library-id` com o nome da biblioteca → `query-docs` com a pergunta específica → aplicar o que foi encontrado na implementação.
 - **Não assumir conhecimento prévio das APIs.** Mesmo para bibliotecas familiares, consultar o Context7 para garantir que está usando a versão correta e as APIs mais recentes — o treinamento pode estar desatualizado.
+
+## Convenções de Código
+
+- **Sempre usar path aliases (`@/*`) para imports cross-diretório no `apps/api`.** Imports como `../lib/auth` ou `../../config/env` devem usar `@/lib/auth`, `@/config/env`, etc. Manter `./` apenas para imports no mesmo diretório (mesmo nível de arquivo), sempre com extensão `.js` (ex: `./app.js`, `./client.js`).
+- **Build: sempre usar `npm run build` (nunca `tsc` diretamente).** O `tsc-alias` é necessário para resolver os path aliases `@/*` no output compilado — `tsc` sozinho gera ESM inválido para Node.js.

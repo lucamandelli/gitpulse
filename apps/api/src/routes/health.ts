@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { pool } from '../db'
+import { pool } from '@/db'
 
 const healthRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/health', async (_, reply) => {

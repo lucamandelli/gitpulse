@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from 'fastify'
 import { fromNodeHeaders } from 'better-auth/node'
-import { auth } from '../lib/auth'
+import { auth } from '@/lib/auth'
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.route({
@@ -16,7 +16,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       })
       const response = await auth.handler(req)
       reply.status(response.status)
-      response.headers.forEach((value, key) => {
+      response.headers.forEach((value: string, key: string) => {
         reply.header(key, value)
       })
       reply.send(await response.text())

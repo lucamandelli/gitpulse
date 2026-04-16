@@ -1,2 +1,2 @@
-export { db, pool } from './client'
-export * from './schema'
+export { db, pool } from './client.js'
+export * from './schema.js'
