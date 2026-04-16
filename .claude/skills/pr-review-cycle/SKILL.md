@@ -1,6 +1,6 @@
 ---
 name: pr-review-cycle
-description: Use when a feature/issue implementation is complete and ready for PR creation, automated review cycle with @claude GitHub App, and merge. Orchestrates the full cycle in the same conversation to preserve implementation context.
+description: Use AUTOMATICALLY whenever implementation of a feature/fix is complete and the user asks to open/create a PR (signals include "abrir PR", "criar PR", "finalizar feature", "push and open PR", "open the PR"). Orchestrates the full cycle — create PR, request @claude review, poll adaptively, address feedback, merge, document — in the same conversation to preserve implementation context. Do not open PRs manually; always route through this skill.
 ---
 
 # PR Review Cycle
@@ -12,6 +12,16 @@ Automate the full PR lifecycle after finishing a feature: create PR → request 
 **Core principle:** The Claude that built the feature is the same Claude that defends, corrects, and documents it.
 
 **Announce at start:** "Using pr-review-cycle skill to create PR, get review from @claude, and merge."
+
+## When to invoke (MANDATORY triggers)
+
+Invoke this skill — do NOT open a PR manually — whenever any of these happen:
+
+- User says "vamos abrir o PR", "criar PR", "push and open PR", "finalizar a feature", "open the PR", or equivalent
+- You just finished implementing a feature/fix on a non-main branch and the user signals completion ("pronto", "tá bom", "feito", "done", "ready")
+- You are about to run `gh pr create` for any reason
+
+If you catch yourself about to run `gh pr create` directly, STOP and invoke this skill instead.
 
 ## The Rationalization Trap
 
@@ -68,13 +78,31 @@ gh pr comment <number> --body "@claude please review this PR"
 
 Initialize cycle counter: `review_cycle = 0`
 
-### Step 4: Poll for review
+### Step 4: Measure PR size, then poll
 
-Use `ScheduleWakeup` to wait before checking:
+Right after creating the PR (Step 2), measure its size once:
 
-- **First check after requesting review:** `delaySeconds: 120`
-- **Subsequent checks (no review yet):** `delaySeconds: 180`
-- **After pushing fixes + re-requesting:** `delaySeconds: 120`
+```bash
+gh pr view <number> --json additions,deletions,changedFiles
+```
+
+Let `loc = additions + deletions` and `files = changedFiles`. Classify:
+
+| Size | Criteria | First wait | Subsequent wait |
+|---|---|---|---|
+| **Small** | files < 5 AND loc < 200 | 120s | 180s |
+| **Medium** | files < 15 AND loc < 800 | 240s | 270s |
+| **Large** | files ≥ 15 OR loc ≥ 800 | 270s | 360s |
+
+Use `ScheduleWakeup` with the delay matching the current poll:
+
+- **First check after requesting review:** first-wait from table above
+- **Subsequent checks (no review yet):** subsequent-wait from table above
+- **After pushing fixes + re-requesting review:** first-wait from table above (reset)
+
+**Rationale for values:** 120s/180s stay inside the 5-min prompt cache TTL (cheap). 240s is still safely cached. 270s is the max that reliably stays cached. 360s accepts one cache miss, amortized across a longer wait appropriate for large PRs. Do not pick 300s — it's the worst-of-both (cache miss without enough amortization).
+
+If after **6 polls in a single review round** there is still no review, fall back to `delaySeconds: 1200` once, then escalate to the user if still nothing.
 
 The `ScheduleWakeup` prompt must instruct to continue at Step 5.
 
@@ -188,7 +216,7 @@ Wait for user instructions before taking any further action.
 | 1 | Run tests + push | `npm test && git push -u origin <branch>` |
 | 2 | Create PR | `gh pr create --base develop` |
 | 3 | Request review | `gh pr comment <N> --body "@claude ..."` |
-| 4 | Poll | `ScheduleWakeup(120-180s)` |
+| 4 | Measure size + poll | `gh pr view --json additions,deletions,changedFiles` + `ScheduleWakeup(120-360s)` |
 | 5 | Check status | `gh api repos/.../pulls/<N>/reviews` |
 | 6 | Process comments | Read + fix/reply |
 | 7 | Push fixes | `git push` + re-request review |
@@ -203,8 +231,11 @@ You implemented the feature — you know why decisions were made. The @claude re
 **Not pushing before creating PR**
 Always `git push -u origin <branch>` before `gh pr create`. The PR needs the remote branch to exist.
 
-**Polling too aggressively**
-The @claude GitHub App needs time to analyze the PR. First check at 120s minimum. Don't burn cache with 60s polls.
+**Polling with fixed 120s regardless of PR size**
+The @claude GitHub App needs more time for larger PRs. Always measure size once (Step 4) and pick delay from the size table. 120s is safe only for small PRs (< 5 files, < 200 LOC).
+
+**Opening a PR without invoking this skill**
+If the user says "abrir PR" / "criar PR" / "finalizar feature", this skill MUST orchestrate the flow. Running `gh pr create` manually skips the review cycle and loses the in-conversation context for addressing @claude's feedback.
 
 **Skipping CI verification before merge**
 Even if review is approved, CI must pass. A merged PR with failing CI breaks `develop` for everyone.

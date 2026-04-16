@@ -39,6 +39,8 @@ Recall from the session: every decision made, every problem hit, every tradeoff 
 
 ### Step 2: Write technical record
 
+> ⚠️ **Never include `@claude` in the issue comment body.** Mentioning the GitHub Claude App triggers an unwanted review on the issue comment itself — review on issues is not part of this workflow and only adds noise/cost. The record is documentation for humans + future Claude sessions, not a review request.
+
 Post a comment with `gh issue comment <number> --repo <owner/repo> --body "..."` structured exactly as:
 
 ---
@@ -134,3 +136,6 @@ A bug caught in spec review is still a bug. Document it — it reveals what the 
 
 **One-paragraph summary instead of structured sections**
 The structure is the value. Future reference requires sections, not prose.
+
+**Mentioning `@claude` in the issue comment**
+Triggers a GitHub App review on the issue, which is unnecessary — this is a post-merge documentation step, not a review request. If you need to link back to PR review discussions, reference the PR number (`#<N>`) without the `@claude` handle.
