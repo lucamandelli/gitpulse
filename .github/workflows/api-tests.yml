@@ -1,0 +1,60 @@
+name: API Tests
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - "apps/api/**"
+      - ".github/workflows/api-tests.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: gitpulse
+          POSTGRES_PASSWORD: gitpulse
+          POSTGRES_DB: gitpulse_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: apps/api/package-lock.json
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: npm ci
+
+      - name: Run migrations
+        working-directory: apps/api
+        env:
+          DATABASE_URL: postgresql://gitpulse:gitpulse@localhost:5433/gitpulse_test
+        run: npx drizzle-kit migrate
+
+      - name: Run tests
+        working-directory: apps/api
+        env:
+          DATABASE_URL: postgresql://gitpulse:gitpulse@localhost:5433/gitpulse_test
+          API_PORT: 3334
+          BETTER_AUTH_SECRET: ci-test-secret-key-change-in-production-32chars
+          BETTER_AUTH_URL: http://localhost:3334
+          GITHUB_CLIENT_ID: ci-test-client-id
+          GITHUB_CLIENT_SECRET: ci-test-client-secret
+          CORS_ORIGIN: http://localhost:3000
+        run: npm test
