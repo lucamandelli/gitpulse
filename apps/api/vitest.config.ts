@@ -17,5 +17,16 @@ export default defineConfig({
     pool: 'forks',
     poolOptions: { forks: { singleFork: true } },
     hookTimeout: 30_000,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov', 'json-summary'],
+      reportsDirectory: './coverage',
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.d.ts', 'src/server.ts'],
+      thresholds: {
+        lines: 50,
+        functions: 50,
+      },
+    },
   },
 })
