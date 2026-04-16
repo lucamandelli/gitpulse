@@ -34,3 +34,6 @@ coverage/
 
 # Superpowers plugin local session data
 .superpowers/
+
+# Git worktrees
+.worktrees/
