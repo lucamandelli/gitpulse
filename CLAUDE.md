@@ -21,3 +21,4 @@
 ## Convenções de Código
 
 - **Sempre usar path aliases (`@/*`) para imports cross-diretório no `apps/api`.** Imports como `../lib/auth` ou `../../config/env` devem usar `@/lib/auth`, `@/config/env`, etc. Manter `./` apenas para imports no mesmo diretório (mesmo nível de arquivo), sempre com extensão `.js` (ex: `./app.js`, `./client.js`).
+- **Build: sempre usar `npm run build` (nunca `tsc` diretamente).** O `tsc-alias` é necessário para resolver os path aliases `@/*` no output compilado — `tsc` sozinho gera ESM inválido para Node.js.
