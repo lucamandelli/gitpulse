@@ -2,9 +2,10 @@
   "name": "@gitpulse/api",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "node dist/server.js",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "tsc-alias": "^1.8.10",
     "@types/node": "^22.15.3",
     "@types/pg": "^8.20.0",
     "drizzle-kit": "^0.31.10",
