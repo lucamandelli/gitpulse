@@ -47,7 +47,7 @@ jobs:
           DATABASE_URL: postgresql://gitpulse:gitpulse@localhost:5433/gitpulse_test
         run: npx drizzle-kit migrate
 
-      - name: Run tests
+      - name: Run tests with coverage
         working-directory: apps/api
         env:
           DATABASE_URL: postgresql://gitpulse:gitpulse@localhost:5433/gitpulse_test
@@ -57,4 +57,12 @@ jobs:
           GITHUB_CLIENT_ID: ci-test-client-id
           GITHUB_CLIENT_SECRET: ci-test-client-secret
           CORS_ORIGIN: http://localhost:3000
-        run: npm test
+        run: npm run test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: apps/api/coverage/
+          retention-days: 14
