@@ -114,7 +114,7 @@ const reposRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(400).send({ error: 'Invalid repository ID' })
     }
 
-    const userId = (request as AuthenticatedRequest).user.id
+    const userId = (request as AuthenticatedRequest<{ Params: { id: string } }>).user.id
 
     const deleted = await db
       .delete(repositories)
