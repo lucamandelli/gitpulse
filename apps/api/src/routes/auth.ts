@@ -16,7 +16,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       })
       const response = await auth.handler(req)
       reply.status(response.status)
-      response.headers.forEach((value, key) => {
+      response.headers.forEach((value: string, key: string) => {
         reply.header(key, value)
       })
       reply.send(await response.text())
