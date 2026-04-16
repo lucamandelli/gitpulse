@@ -9,7 +9,7 @@ let idCounter = 0
 const nextId = () => `test-${++idCounter}-${Date.now()}`
 
 export async function userFactory(overrides?: Partial<User>): Promise<User> {
-  const id = nextId()
+  const id = overrides?.id ?? nextId()
   const [user] = await db
     .insert(users)
     .values({

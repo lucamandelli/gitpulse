@@ -1,15 +1,27 @@
-import { describe, it, expect, afterAll } from 'vitest'
-import { http, HttpResponse } from 'msw'
-import { server } from '../mocks/node.js'
-import { buildTestApp, buildAuthenticatedApp } from '../helpers/build-app.js'
+import { describe, it, expect, beforeAll, beforeEach, afterAll } from 'vitest'
+import type { FastifyInstance } from 'fastify'
+import { buildTestApp, mockSession } from '../helpers/build-app.js'
 import { userFactory, accountFactory, repoFactory } from '../helpers/factories.js'
 
+const USER_A_ID = 'test-repos-user-a'
+const USER_B_ID = 'test-repos-user-b'
+
+let app: FastifyInstance
+
+beforeAll(async () => {
+  app = await buildTestApp()
+})
+
+afterAll(async () => app.close())
+
 describe('POST /api/repos', () => {
+  beforeEach(() => {
+    mockSession(USER_A_ID)
+  })
+
   it('retorna 201 e persiste o repositório quando dados válidos', async () => {
-    const user = await userFactory()
-    await accountFactory(user.id, { accessToken: 'valid-token' })
-    const app = await buildAuthenticatedApp({ id: user.id })
-    afterAll(() => app.close())
+    await userFactory({ id: USER_A_ID })
+    await accountFactory(USER_A_ID, { accessToken: 'valid-token' })
 
     const response = await app.inject({
       method: 'POST',
@@ -22,13 +34,11 @@ describe('POST /api/repos', () => {
     const body = response.json()
     expect(body.repository).toBeDefined()
     expect(body.repository.githubRepoName).toBe('owner/repo')
-    expect(body.repository.userId).toBe(user.id)
+    expect(body.repository.userId).toBe(USER_A_ID)
   })
 
   it('retorna 400 quando fullName está em formato inválido', async () => {
-    const user = await userFactory()
-    const app = await buildAuthenticatedApp({ id: user.id })
-    afterAll(() => app.close())
+    await userFactory({ id: USER_A_ID })
 
     const response = await app.inject({
       method: 'POST',
@@ -43,24 +53,8 @@ describe('POST /api/repos', () => {
     expect(body.details).toBeDefined()
   })
 
-  it('retorna 401 quando não autenticado', async () => {
-    const app = await buildTestApp()
-    afterAll(() => app.close())
-
-    const response = await app.inject({
-      method: 'POST',
-      url: '/api/repos',
-      headers: { 'content-type': 'application/json' },
-      payload: { fullName: 'owner/repo' },
-    })
-
-    expect(response.statusCode).toBe(401)
-  })
-
   it('retorna 401 quando user não tem token GitHub no DB', async () => {
-    const user = await userFactory()
-    const app = await buildAuthenticatedApp({ id: user.id })
-    afterAll(() => app.close())
+    await userFactory({ id: USER_A_ID })
 
     const response = await app.inject({
       method: 'POST',
@@ -74,10 +68,8 @@ describe('POST /api/repos', () => {
   })
 
   it('retorna 401 quando token GitHub é inválido', async () => {
-    const user = await userFactory()
-    await accountFactory(user.id, { accessToken: 'invalid-token' })
-    const app = await buildAuthenticatedApp({ id: user.id })
-    afterAll(() => app.close())
+    await userFactory({ id: USER_A_ID })
+    await accountFactory(USER_A_ID, { accessToken: 'invalid-token' })
 
     const response = await app.inject({
       method: 'POST',
@@ -91,10 +83,8 @@ describe('POST /api/repos', () => {
   })
 
   it('retorna 404 quando repositório não existe no GitHub', async () => {
-    const user = await userFactory()
-    await accountFactory(user.id, { accessToken: 'valid-token' })
-    const app = await buildAuthenticatedApp({ id: user.id })
-    afterAll(() => app.close())
+    await userFactory({ id: USER_A_ID })
+    await accountFactory(USER_A_ID, { accessToken: 'valid-token' })
 
     const response = await app.inject({
       method: 'POST',
@@ -108,11 +98,9 @@ describe('POST /api/repos', () => {
   })
 
   it('retorna 409 quando repositório já está sendo monitorado', async () => {
-    const user = await userFactory()
-    await accountFactory(user.id, { accessToken: 'valid-token' })
-    await repoFactory(user.id, { githubRepoName: 'owner/repo' })
-    const app = await buildAuthenticatedApp({ id: user.id })
-    afterAll(() => app.close())
+    await userFactory({ id: USER_A_ID })
+    await accountFactory(USER_A_ID, { accessToken: 'valid-token' })
+    await repoFactory(USER_A_ID, { githubRepoName: 'owner/repo' })
 
     const response = await app.inject({
       method: 'POST',
@@ -127,14 +115,15 @@ describe('POST /api/repos', () => {
 })
 
 describe('GET /api/repos', () => {
-  it('retorna 200 com apenas os repos do usuário autenticado', async () => {
-    const userA = await userFactory()
-    const userB = await userFactory()
-    await repoFactory(userA.id, { githubRepoName: 'userA/repoA' })
-    await repoFactory(userB.id, { githubRepoName: 'userB/repoB' })
+  beforeEach(() => {
+    mockSession(USER_A_ID)
+  })
 
-    const app = await buildAuthenticatedApp({ id: userA.id })
-    afterAll(() => app.close())
+  it('retorna 200 com apenas os repos do usuário autenticado', async () => {
+    await userFactory({ id: USER_A_ID })
+    await userFactory({ id: USER_B_ID })
+    await repoFactory(USER_A_ID, { githubRepoName: 'userA/repoA' })
+    await repoFactory(USER_B_ID, { githubRepoName: 'userB/repoB' })
 
     const response = await app.inject({ method: 'GET', url: '/api/repos' })
 
@@ -143,23 +132,16 @@ describe('GET /api/repos', () => {
     expect(body.repositories).toHaveLength(1)
     expect(body.repositories[0].githubRepoName).toBe('userA/repoA')
   })
-
-  it('retorna 401 quando não autenticado', async () => {
-    const app = await buildTestApp()
-    afterAll(() => app.close())
-
-    const response = await app.inject({ method: 'GET', url: '/api/repos' })
-
-    expect(response.statusCode).toBe(401)
-  })
 })
 
 describe('DELETE /api/repos/:id', () => {
+  beforeEach(() => {
+    mockSession(USER_A_ID)
+  })
+
   it('retorna 200 e o repositório deletado quando é do próprio usuário', async () => {
-    const user = await userFactory()
-    const repo = await repoFactory(user.id)
-    const app = await buildAuthenticatedApp({ id: user.id })
-    afterAll(() => app.close())
+    await userFactory({ id: USER_A_ID })
+    const repo = await repoFactory(USER_A_ID)
 
     const response = await app.inject({ method: 'DELETE', url: `/api/repos/${repo.id}` })
 
@@ -170,9 +152,7 @@ describe('DELETE /api/repos/:id', () => {
   })
 
   it('retorna 400 quando id não é um número', async () => {
-    const user = await userFactory()
-    const app = await buildAuthenticatedApp({ id: user.id })
-    afterAll(() => app.close())
+    await userFactory({ id: USER_A_ID })
 
     const response = await app.inject({ method: 'DELETE', url: '/api/repos/abc' })
 
@@ -181,24 +161,35 @@ describe('DELETE /api/repos/:id', () => {
   })
 
   it('retorna 404 quando repo pertence a outro usuário', async () => {
-    const userA = await userFactory()
-    const userB = await userFactory()
-    const repo = await repoFactory(userB.id)
-    const app = await buildAuthenticatedApp({ id: userA.id })
-    afterAll(() => app.close())
+    await userFactory({ id: USER_A_ID })
+    await userFactory({ id: USER_B_ID })
+    const repo = await repoFactory(USER_B_ID)
 
     const response = await app.inject({ method: 'DELETE', url: `/api/repos/${repo.id}` })
 
     expect(response.statusCode).toBe(404)
     expect(response.json()).toEqual({ error: 'Repository not found' })
   })
+})
 
-  it('retorna 401 quando não autenticado', async () => {
-    const app = await buildTestApp()
-    afterAll(() => app.close())
+describe('rotas de repos — anônimo', () => {
+  it('POST /api/repos retorna 401', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/repos',
+      headers: { 'content-type': 'application/json' },
+      payload: { fullName: 'owner/repo' },
+    })
+    expect(response.statusCode).toBe(401)
+  })
 
+  it('GET /api/repos retorna 401', async () => {
+    const response = await app.inject({ method: 'GET', url: '/api/repos' })
+    expect(response.statusCode).toBe(401)
+  })
+
+  it('DELETE /api/repos/:id retorna 401', async () => {
     const response = await app.inject({ method: 'DELETE', url: '/api/repos/1' })
-
     expect(response.statusCode).toBe(401)
   })
 })

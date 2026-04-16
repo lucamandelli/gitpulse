@@ -10,29 +10,26 @@ export async function buildTestApp(): Promise<FastifyInstance> {
   return app
 }
 
-export async function buildAuthenticatedApp(
-  user?: Partial<User>,
-  session?: Partial<Session>,
-): Promise<FastifyInstance> {
+export function mockSession(userId: string, overrides?: { user?: Partial<User>; session?: Partial<Session> }) {
   const userFixture: User = {
-    id: user?.id ?? 'test-user-id',
-    name: user?.name ?? 'Test User',
-    email: user?.email ?? 'test@example.com',
-    emailVerified: user?.emailVerified ?? false,
-    image: user?.image ?? null,
-    createdAt: user?.createdAt ?? new Date(),
-    updatedAt: user?.updatedAt ?? new Date(),
+    id: userId,
+    name: overrides?.user?.name ?? 'Test User',
+    email: overrides?.user?.email ?? `${userId}@example.com`,
+    emailVerified: overrides?.user?.emailVerified ?? false,
+    image: overrides?.user?.image ?? null,
+    createdAt: overrides?.user?.createdAt ?? new Date(),
+    updatedAt: overrides?.user?.updatedAt ?? new Date(),
   }
 
   const sessionFixture: Session = {
-    id: session?.id ?? 'test-session-id',
-    userId: userFixture.id,
-    token: session?.token ?? 'test-token',
-    expiresAt: session?.expiresAt ?? new Date(Date.now() + 86400000),
-    createdAt: session?.createdAt ?? new Date(),
-    updatedAt: session?.updatedAt ?? new Date(),
-    ipAddress: session?.ipAddress ?? null,
-    userAgent: session?.userAgent ?? null,
+    id: overrides?.session?.id ?? 'test-session-id',
+    userId,
+    token: overrides?.session?.token ?? 'test-token',
+    expiresAt: overrides?.session?.expiresAt ?? new Date(Date.now() + 86400000),
+    createdAt: overrides?.session?.createdAt ?? new Date(),
+    updatedAt: overrides?.session?.updatedAt ?? new Date(),
+    ipAddress: overrides?.session?.ipAddress ?? null,
+    userAgent: overrides?.session?.userAgent ?? null,
   }
 
   vi.spyOn(auth.api, 'getSession').mockResolvedValue({
@@ -40,7 +37,5 @@ export async function buildAuthenticatedApp(
     session: sessionFixture,
   })
 
-  const app = await buildApp()
-  await app.ready()
-  return app
+  return { userFixture, sessionFixture }
 }
