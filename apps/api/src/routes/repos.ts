@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { db } from '@/db/client'
 import { repositories, accounts } from '@/db/schema'
-import authGuard from '@/plugins/auth-guard'
+import authGuard, { AuthenticatedRequest } from '@/plugins/auth-guard'
 import {
   fetchGitHubRepo,
   GitHubTokenNotFoundError,
@@ -45,7 +45,7 @@ const reposRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     const { fullName } = parsed.data
-    const userId = request.user!.id
+    const userId = (request as AuthenticatedRequest).user.id
 
     let accessToken: string
 
@@ -97,7 +97,7 @@ const reposRoutes: FastifyPluginAsync = async (fastify) => {
   })
 
   fastify.get('/api/repos', async (request, reply) => {
-    const userId = request.user!.id
+    const userId = (request as AuthenticatedRequest).user.id
 
     const repos = await db
       .select()
@@ -114,7 +114,7 @@ const reposRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(400).send({ error: 'Invalid repository ID' })
     }
 
-    const userId = request.user!.id
+    const userId = (request as AuthenticatedRequest).user.id
 
     const deleted = await db
       .delete(repositories)
