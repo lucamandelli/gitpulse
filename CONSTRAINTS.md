@@ -23,15 +23,17 @@ Checked by `node scripts/floor-guard.mjs --base origin/main` at task end and in 
 | Types | Zero errors, `strict` on | Types are the cheapest proof the code fits together | `pnpm typecheck` | every edit | #32 |
 | Lint | Zero ESLint errors | One shared config keeps parallel agents' code consistent | `pnpm lint` | every edit | #32 |
 | Format | Zero Prettier differences | Diffs show behavior changes, not whitespace | `pnpm format:check` | every edit | #32 |
-| Secrets | Zero findings | A leaked key is public forever on a public repo | `gitleaks git --redact --no-banner` | every edit, CI | #32, #34 |
+| Secrets | Zero findings in the change | A leaked key is public forever on a public repo. Scoped to the change because old history has a known false positive (a public badge token from the NestJS template README) | edit: `gitleaks git --pre-commit --redact --no-banner`; CI: `gitleaks git --redact --no-banner --log-opts="origin/main..HEAD"` | every edit, CI | #32, #34 |
 | Coverage: changed lines | ≥ 80% of changed lines in `apps/*/src` covered | High enough to force a test for new code, low enough to allow config lines | `diff-cover coverage/lcov.info --compare-branch=origin/main --fail-under=80` | task end, CI | #34 |
 | Coverage: API project | ≥ 80% lines in `apps/api/src`, excluding `main.ts` and `instrumentation.ts` | The repo starts empty, so the bar can hold from the first commit | `pnpm --filter api test:coverage` (Vitest thresholds) | task end, CI | #34 |
 | Architecture | Zero dependency-cruiser violations | Module boundaries rot one shortcut import at a time | `pnpm check:boundaries` | task end, CI | #37 |
-| Security: code | Zero high or critical findings | External rule set, independent of our own tests | `semgrep scan --config p/default --config p/owasp-top-ten --error` | CI | #34 |
+| Security: code | Zero findings from ERROR-severity rules (Semgrep's high) | External rule set, independent of our own tests | `semgrep scan --config p/default --config p/owasp-top-ten --severity ERROR --error --metrics=off` | CI | #34 |
 | Security: dependencies | Nothing at high or above | Below high is mostly noise | `osv-scanner scan source -r .` | CI | #34 |
 | Accessibility | Zero critical or serious WCAG 2.1 AA violations on every E2E page | Moderate and minor findings are often debatable | `@axe-core/playwright` inside `pnpm test:e2e` | CI | #41 |
 
 Secrets, dependencies, code scanning and accessibility are judged by external rule sets, so they hold even when the agent wrote both the code and the tests.
+
+The gitleaks, diff-cover, osv-scanner and Semgrep commands were run on 2026-10-23 against gitleaks 8.30.1, diff-cover 10.6.0, osv-scanner 2.7.0 and Semgrep 1.181.1, including probes that must fail (a fake token, 50% changed-line coverage). osv-scanner exits 128 while the repo has no lockfile; that ends with #32. The pnpm and Vitest commands are verified when #32 and #34 create them.
 
 ## Review rules
 
