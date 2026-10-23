@@ -8,8 +8,8 @@
 
 ## Git
 
-- Never commit directly to `main` or `develop`. Branch off `develop`.
-- PRs from feature branches target `develop`. `main` only reflects what is in production.
+- `main` is the only long-lived branch. Never commit directly to it.
+- Branch off `main` and open PRs back into `main`.
 - Atomic commits using Conventional Commits.
 
 ## Language
