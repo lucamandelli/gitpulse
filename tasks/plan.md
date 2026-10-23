@@ -14,21 +14,22 @@ Tasks are tracked in GitHub Issues as sub-issues of the M0 epic [#31](https://gi
 - Hostinger KVM 2 to start, measured and right-sized after the first deploy.
 
 ## Task List
-Tasks in the same wave can run in parallel.
+Tasks in the same wave can run in parallel. Dependencies are also set as native "blocked by" links on the issues.
 
 | Wave | Tasks |
 |---|---|
-| 1 | [#32](https://github.com/lucamandelli/gitpulse/issues/32) pnpm monorepo, [#43](https://github.com/lucamandelli/gitpulse/issues/43) VPS and domain |
-| 2 | [#33](https://github.com/lucamandelli/gitpulse/issues/33) NestJS API, [#47](https://github.com/lucamandelli/gitpulse/issues/47) research: treehouse |
-| 3 | [#34](https://github.com/lucamandelli/gitpulse/issues/34) CI |
-| 4 | [#35](https://github.com/lucamandelli/gitpulse/issues/35) Postgres, Redis, readiness, [#37](https://github.com/lucamandelli/gitpulse/issues/37) module boundaries, [#38](https://github.com/lucamandelli/gitpulse/issues/38) web app, [#49](https://github.com/lucamandelli/gitpulse/issues/49) research: no-mistakes |
-| 5 | [#36](https://github.com/lucamandelli/gitpulse/issues/36) API sign in, [#40](https://github.com/lucamandelli/gitpulse/issues/40) containers and Caddy, [#42](https://github.com/lucamandelli/gitpulse/issues/42) observability |
-| 6 | [#39](https://github.com/lucamandelli/gitpulse/issues/39) web sign in |
-| 7 | [#41](https://github.com/lucamandelli/gitpulse/issues/41) E2E, [#48](https://github.com/lucamandelli/gitpulse/issues/48) research: verification skills |
-| 8 | [#44](https://github.com/lucamandelli/gitpulse/issues/44) deploy on merge |
-| 9 | [#45](https://github.com/lucamandelli/gitpulse/issues/45) right-size the VPS, [#46](https://github.com/lucamandelli/gitpulse/issues/46) README |
+| 1 | [#47](https://github.com/lucamandelli/gitpulse/issues/47) research: treehouse, [#43](https://github.com/lucamandelli/gitpulse/issues/43) VPS and domain |
+| 2 | [#32](https://github.com/lucamandelli/gitpulse/issues/32) pnpm monorepo |
+| 3 | [#33](https://github.com/lucamandelli/gitpulse/issues/33) NestJS API |
+| 4 | [#34](https://github.com/lucamandelli/gitpulse/issues/34) CI |
+| 5 | [#35](https://github.com/lucamandelli/gitpulse/issues/35) Postgres, Redis, readiness, [#37](https://github.com/lucamandelli/gitpulse/issues/37) module boundaries, [#38](https://github.com/lucamandelli/gitpulse/issues/38) web app, [#49](https://github.com/lucamandelli/gitpulse/issues/49) research: no-mistakes |
+| 6 | [#36](https://github.com/lucamandelli/gitpulse/issues/36) API sign in, [#40](https://github.com/lucamandelli/gitpulse/issues/40) containers and Caddy, [#42](https://github.com/lucamandelli/gitpulse/issues/42) observability |
+| 7 | [#39](https://github.com/lucamandelli/gitpulse/issues/39) web sign in |
+| 8 | [#41](https://github.com/lucamandelli/gitpulse/issues/41) E2E, [#48](https://github.com/lucamandelli/gitpulse/issues/48) research: verification skills |
+| 9 | [#44](https://github.com/lucamandelli/gitpulse/issues/44) deploy on merge |
+| 10 | [#45](https://github.com/lucamandelli/gitpulse/issues/45) right-size the VPS, [#46](https://github.com/lucamandelli/gitpulse/issues/46) README |
 
-### Checkpoint A: after #32-#35
+### Checkpoint A: after #47 and #32-#35
 - [ ] API runs locally with live and ready health checks
 - [ ] CI green on `main`, coverage gate active
 

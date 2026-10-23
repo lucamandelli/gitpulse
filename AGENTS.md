@@ -8,6 +8,7 @@ The project follows the [agent-skills](https://github.com/addyosmani/agent-skill
 - Plan: `tasks/plan.md`, the plan for the current milestone. Replaced when the next milestone starts.
 - Tasks: GitHub Issues, as sub-issues of the milestone epic. A task is done when the PR that closes its issue is merged.
 - Before implementing a task, read `SPEC.md`, `tasks/plan.md` and the task's issue.
+- Read `CONSTRAINTS.md` before writing code. Do not weaken it to make a change pass.
 - Vision and roadmap: the GitPulse GitHub Project README. Architecture decisions: `docs/adr/`.
 
 ## Planning

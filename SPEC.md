@@ -105,13 +105,13 @@ export class MeController {
 - API integration: Nest testing module + Supertest against real Postgres and Redis started by Testcontainers. Every new or changed route ships with integration tests. Sessions are created through factories, never through real GitHub.
 - Web: Vitest + Testing Library for components with logic.
 - E2E: Playwright against the Compose stack: unauthenticated visitor sees the login screen, a seeded session sees name and avatar, sign out works.
-- Coverage: reported on every PR. Gate at 80% lines for `apps/api`.
+- Coverage: reported on every PR. Gates at 80% of changed lines and 80% of `apps/api/src` lines, as defined in `CONSTRAINTS.md`.
 - Production: the deploy workflow fails if `/api/health/ready` is not 200 after rollout.
 
 ## Boundaries
 - Always: tests for every new or changed route; lint, format, typecheck, boundaries and tests green before pushing; Conventional Commits; English everywhere; schema changes through `drizzle-kit generate`; secrets only in env files ignored by git and in GitHub secrets.
 - Ask first: new dependencies; schema changes; changes to CI or deploy workflows; loosening a dependency-cruiser rule or the coverage gate; infra changes (ports, volumes, VPS).
-- Never: commit secrets or `.env`; import another module's internals; touch another module's tables; skip or delete failing tests; push to `main` directly; disable lint rules inline without a comment explaining why.
+- Never: commit secrets or `.env`; import another module's internals; touch another module's tables; skip or delete failing tests; push to `main` directly; add suppression comments or otherwise lower the bar in `CONSTRAINTS.md`.
 
 ## Success Criteria
 1. The production domain serves the SPA over HTTPS with a valid certificate, and HTTP redirects to HTTPS.
