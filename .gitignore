@@ -32,8 +32,5 @@ coverage/
 # Claude Code local settings (personal overrides, not shared)
 .claude/settings.local.json
 
-# Superpowers plugin local session data
-.superpowers/
-
 # Git worktrees
 .worktrees/
